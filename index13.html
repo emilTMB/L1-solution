@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <script>
+
+    // Shape (Фигура): Это базовый класс для всех геометрических фигур. У него есть свойство type, которое идентифицирует тип фигуры, 
+    // и два метода: calculateArea для расчета площади и calculatePerimeter для расчета периметра. 
+    // Оба метода возвращают строки с сообщениями о том, что площадь и периметр не определены в базовом классе.
+
+    // Базовый класс Shape (фигура)
+    class Shape {
+      constructor() {
+        this.type = 'Shape'; // Тип фигуры
+      }
+
+      // Метод для расчета площади (в базовом классе он не определен)
+      calculateArea() {
+        return 'Площадь не определена';
+      }
+
+      // Метод для расчета периметра (в базовом классе он не определен)
+      calculatePerimeter() {
+        return 'Периметр не определен';
+      }
+    }
+
+    // В данной строке class Rectangle extends Shape происходит объявление класса с именем Rectangle, 
+    // который является подклассом (или производным классом) от другого класса с именем Shape. 
+    // Данное ключевое слово extends используется в контексте объектно-ориентированного программирования (ООП) для создания иерархии классов, 
+    // где подкласс наследует свойства и методы от родительского класса.
+
+    // Подкласс Rectangle (прямоугольник)
+    class Rectangle extends Shape {
+      constructor(width, height) {
+        // super() - это вызов конструктора родительского класса внутри конструктора дочернего класса. 
+        // В контексте объектно-ориентированного программирования (ООП), super() используется для инициализации наследуемых свойств и методов из родительского класса, 
+        // прежде чем выполнится специфическая инициализация дочернего класса.
+        super();
+        this.type = 'Rectangle'; // Тип прямоугольника
+        this.width = width;
+        this.height = height;
+      }
+
+      // Переопределение метода для расчета площади
+      calculateArea() {
+        return this.width * this.height;
+      }
+
+      // Переопределение метода для расчета периметра
+      calculatePerimeter() {
+        return 2 * (this.width + this.height);
+      }
+    }
+
+    // Подкласс Circle (круг)
+    class Circle extends Shape {
+      constructor(radius) {
+        super();
+        this.type = 'Circle'; // Тип круга
+        this.radius = radius;
+      }
+
+      // Переопределение метода для расчета площади
+      calculateArea() {
+        return Math.PI * this.radius * this.radius;
+      }
+
+      // Переопределение метода для расчета периметра
+      calculatePerimeter() {
+        return 2 * Math.PI * this.radius;
+      }
+    }
+
+    // Подкласс Triangle (треугольник)
+    class Triangle extends Shape {
+      constructor(a, b, c) {
+        super();
+        this.type = 'Triangle'; // Тип треугольника
+        this.a = a;
+        this.b = b;
+        this.c = c;
+      }
+
+      // Переопределение метода для расчета площади (по формуле Герона)
+      calculateArea() {
+        const s = (this.a + this.b + this.c) / 2;
+        return Math.sqrt(s * (s - this.a) * (s - this.b) * (s - this.c));
+      }
+
+      // Переопределение метода для расчета периметра
+      calculatePerimeter() {
+        return this.a + this.b + this.c;
+      }
+    }
+
+    // Пример использования классов:
+    const rectangle = new Rectangle(5, 10);
+    console.log(rectangle.type); // Выведет: "Rectangle"
+    console.log('Площадь прямоугольника:', rectangle.calculateArea()); // Выведет: 50
+    console.log('Периметр прямоугольника:', rectangle.calculatePerimeter()); // Выведет: 30
+
+    const circle = new Circle(3);
+    console.log(circle.type); // Выведет: "Circle"
+    console.log('Площадь круга:', circle.calculateArea()); // Выведет: ~28.27
+    console.log('Периметр круга:', circle.calculatePerimeter()); // Выведет: ~18.85
+
+    const triangle = new Triangle(3, 4, 5);
+    console.log(triangle.type); // Выведет: "Triangle"
+    console.log('Площадь треугольника:', triangle.calculateArea()); // Выведет: 6
+    console.log('Периметр треугольника:', triangle.calculatePerimeter()); // Выведет: 12
+  </script>
+</body>
+
+</html>

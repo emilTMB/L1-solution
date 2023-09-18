@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="main">
+        <div class="elem1" style="width: 300px; height: 300px;">
+            <p>123123123123</p>
+        </div>
+        <div class="elem2" style="width: 300px; height: 300px;">
+            <p>567567567567</p>
+        </div>
+    </div>
+    <script>
+        //Объявляем функцию recursiveDOMTraversal с двумя параметрами: node и action. 
+        //Функция будет принимать начальный узел node, с которого начнется обход, и функцию action, которая будет выполнена для каждого узла.
+        function recursiveDOMTraversal(node, action) {
+            // Здесь вызывается функция action и передается текущий узел node в качестве аргумента. 
+            // Это означает, что функция action будет выполнена для текущего узла, на котором находится обход.
+            // Выполняем действие с текущим узлом
+            action(node);
+
+            // Проверяем, есть ли у текущего узла дочерние элементы. Если у текущего узла есть дочерние элементы, то начинается рекурсивный обход.
+            // Рекурсивно обходим дочерние элементы, если они есть
+            if (node.hasChildNodes()) {
+                // Создается переменная children, в которой сохраняются все дочерние элементы текущего узла. 
+                // node.childNodes - это коллекция, содержащая все дочерние узлы текущего узла.
+                const children = node.childNodes;
+                // Здесь начинается цикл for, который будет перебирать все дочерние элементы текущего узла.
+                for (let i = 0; i < children.length; i++) {
+                    // Внутри цикла вызывается функция recursiveDOMTraversal рекурсивно для каждого дочернего элемента children[i]. 
+                    // Это означает, что обход будет выполняться для каждого дочернего элемента, начиная с самого верхнего и спускаясь глубже в дерево.
+                    recursiveDOMTraversal(children[i], action);
+                }
+            }
+        }
+
+        // Пример использования функции для вывода информации о тегах в консоль
+        const rootElement = document.body;
+        // Вызывается функцию recursiveDOMTraversal для начала обхода с rootElement. 
+        // В качестве второго аргумента передается анонимная функция, которая будет выполняться для каждого узла.
+        recursiveDOMTraversal(rootElement, function (node) {
+            // Внутри анонимной функции проверяется тип узла. Если узел является элементом (тегом), то выполняются следующие действия:
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                console.log("Тег:", node.tagName);
+                console.log("Класс:", node.className);
+            }
+        });
+    </script>
+</body>
+
+</html>

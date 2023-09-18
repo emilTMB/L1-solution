@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        //Функцию parseJSON, используется для разбора (парсинга) строки JSON в объект JavaScript.
+        function parseJSON(jsonString) {
+            try {
+                let parsedObject = JSON.parse(jsonString);
+                return parsedObject;
+            } catch (error) {
+                console.error('Ошибка при разборе JSON:', error);
+                return null;
+            }
+        }
+
+        // Пример использования:
+        let jsonString = '{"name":"John","age":30,"city":"New York"}';
+        let parsedObject = parseJSON(jsonString);
+
+        if (parsedObject !== null) {
+            console.log(parsedObject); // Выведет объект, если парсинг успешен
+        }
+    </script>
+</body>
+
+</html>

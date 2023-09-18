@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        let book = {
+            title: 'Имя книги',
+            author: 'Имя автора',
+            year: 2023,
+
+            // Для каждого свойства title, author и year определены методы getTitle, getAuthor, getYear для получения значения и методы setTitle,
+            // setAuthor, setYear для изменения значения. Методы используют ключевое слово this для обращения к свойствам объекта book.
+            
+            // Метод для получения названия книги
+            getTitle: function () {
+                return this.title;
+            },
+
+            // Метод для изменения названия книги
+            setTitle: function (newTitle) {
+                this.title = newTitle;
+            },
+
+            // Метод для получения имени автора
+            getAuthor: function () {
+                return this.author;
+            },
+
+            // Метод для изменения имени автора
+            setAuthor: function (newAuthor) {
+                this.author = newAuthor;
+            },
+
+            // Метод для получения года издания
+            getYear: function () {
+                return this.year;
+            },
+
+            // Метод для изменения года издания
+            setYear: function (newYear) {
+                this.year = newYear;
+            }
+        };
+
+        // Пример использования методов объекта
+        console.log(book.getTitle()); // Выведет: "Имя книги"
+        book.setTitle('Новое название книги');
+        console.log(book.getTitle()); // Выведет: "Новое название книги"
+
+        console.log(book.getAuthor()); // Выведет: "Имя автора"
+        book.setAuthor('Новый автор');
+        console.log(book.getAuthor()); // Выведет: "Новый автор"
+
+        console.log(book.getYear()); // Выведет: 2023
+        book.setYear(2024);
+        console.log(book.getYear()); // Выведет: 2024
+    </script>
+</body>
+
+</html>

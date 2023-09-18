@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <script>
+    function outerFunction() {
+      let outerletiable = 10; // Переменная определена во внешней функции
+
+      // Внутренняя функция, которая имеет доступ к переменной outerletiable
+      function innerFunction() {
+        console.log(outerletiable);
+      }
+
+      // Возвращаем внутреннюю функцию
+      return innerFunction;
+    }
+
+    // Создаем замыкание
+    let closure = outerFunction();
+
+    // Вызываем внутреннюю функцию, которая все еще имеет доступ к outerletiable
+    closure(); // Выведет: 10
+
+    //В этом примере outerFunction определяет внешнюю функцию, которая в свою очередь определяет переменную outerletiable и внутреннюю функцию innerFunction.
+    //Затем outerFunction возвращает innerFunction, создавая замыкание.
+    //Когда мы вызываем outerFunction(), она возвращает innerFunction, и мы сохраняем ее в переменной closure. Затем, когда мы вызываем closure(),
+    //она все равно имеет доступ к переменной outerletiable, даже если outerFunction завершила свое выполнение, благодаря замыканию.
+  </script>
+</body>
+
+</html>

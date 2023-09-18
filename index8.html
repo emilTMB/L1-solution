@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        // Это объявление функции executeFunctionsAndReturnResults, которая принимает один аргумент functions. Этот аргумент должен быть массивом функций.
+        function executeFunctionsAndReturnResults(functions) {
+            // Возвращаем анонимную функцию (функцию без имени). Внутри этой анонимной функции будет выполняться набор функций из переданного массива.
+            return function () {
+                let results = [];
+
+                // Начинается цикл for, который перебирает все функции в массиве functions
+                for (let i = 0; i < functions.length; i++) {
+                    // Каждая функция из массива functions вызывается, и ее результат сохраняется в переменной result
+                    let result = functions[i]();
+                    results.push(result);
+                }
+
+                return results;
+            };
+        }
+
+        // Пример использования:
+        let functions = [
+            function () {
+                return 1;
+            },
+            function () {
+                return 2;
+            },
+            function () {
+                return 3;
+            }
+        ];
+        // Функция executeFunctionsAndReturnResults вызывается с передачей массива functions. Результат этого вызова сохраняется в переменной executeAll. 
+        // executeAll теперь содержит анонимную функцию, которая может выполнить все функции из массива functions и вернуть результаты.
+        let executeAll = executeFunctionsAndReturnResults(functions);
+        // Вызывается анонимная функция, сохраненная в executeAll, что приводит к выполнению всех функций из массива functions и возврату их результатов. 
+        // Результаты сохраняются в переменной results
+        let results = executeAll(); // Вызываем новую функцию
+        console.log(results); // [1, 2, 3]
+    </script>
+</body>
+
+</html>

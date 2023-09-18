@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+    //Определена функция getMaxLocalStorageSize()
+        function getMaxLocalStorageSize() {
+            // minSize изначально устанавливается равным 0.
+            // maxSize устанавливается в 10 мегабайт(10 * 1024 * 1024 байт), что представляет собой начальный максимальный размер.
+            let minSize = 0;
+            let maxSize = 10 * 1024 * 1024; // Начнем с максимально возможного объема (10 МB)
+            // цикл while с условием maxSize - minSize > 1. Этот цикл будет продолжаться, 
+            // пока разница между maxSize и minSize больше 1, эффективно сужая поиск максимального доступного размера.
+            while (maxSize - minSize > 1) {
+                // testSize вычисляется как среднее значение между minSize и maxSize, 
+                // с использованием Math.floor() для обеспечения целочисленного значения.
+                let testSize = Math.floor((minSize + maxSize) / 2);
+                try {
+                    // Создается строка data, повторяя символ 'a' testSize раз, что фактически создает строку нужного размера.
+                    let data = 'a'.repeat(testSize); // Создаем строку определенного размера
+                    // localStorage.setItem('test', data) сохраняем эту строку в localStorage под ключом 'test'.
+                    localStorage.setItem('test', data);
+                    // localStorage.removeItem('test') немедленно удаляет сохраненные данные.
+                    localStorage.removeItem('test');
+                    // Если эта операция выполнена успешно, это означает, что testSize может быть сохранен в localStorage без проблем, 
+                    // поэтому minSize обновляется до testSize.
+                    minSize = testSize;
+
+                    // Если возникает исключение (например, QuotaExceededError), это означает, что testSize слишком велик для хранения в localStorage, 
+                    // поэтому maxSize обновляется до testSize.
+                } catch (e) {
+                    maxSize = testSize;
+                }
+                // Цикл продолжает работу, пока разница между maxSize и minSize не станет меньше или равной 1. В этот момент цикл завершается, 
+                // так как он сузил максимальный размер до диапазона 1 байт.
+            }
+
+            return minSize / (1024 * 1024); // Возвращаем размер в мегабайтах
+        }
+
+        let maxLocalStorageSize = getMaxLocalStorageSize();
+        console.log('Максимальный объем localStorage:', maxLocalStorageSize, 'MB');
+    </script>
+</body>
+
+</html>

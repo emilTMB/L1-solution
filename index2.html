@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script>
+        function StrangeNumber(number) {
+    if (number <= 0) {
+      return false; // Не рассматриваем отрицательные числа и ноль
+    }
+    
+    // Создадим переменную для хранения суммы делителей
+    let sum = 0;
+  
+    // Итерируемся от 1 до (number - 1), проверяя каждое число на делимость
+    // Проверяем, является ли number (исходное число) делителем i. Сделаем это с помощью % (оператора остатка от деления).
+    // Если остаток от деления number на i равен нулю, тогда i будет являться делителем number.
+    for (let i = 1; i < number; i++) {
+      if (number % i === 0) {
+        sum += i; // Если i является делителем, добавляем его к сумме
+      }
+    }
+  
+    // Сравниваем сумму делителей с исходным числом и возвращаем результат
+    return sum === number;
+  }
+  
+  console.log(StrangeNumber(6)); // true, так как 6 = 1 + 2 + 3
+  console.log(StrangeNumber(12)); // false, так как 12 != 1 + 2 + 3 + 4 + 6
+    </script>
+</body>
+</html>

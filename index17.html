@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Геокодинг адреса</title>
+  <style>
+    #address-input {
+      width: 300px;
+    }
+
+    #suggestions-list {
+      display: none;
+      border: 1px solid #ccc;
+      max-height: 150px;
+      overflow-y: scroll;
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .suggestion-item {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .suggestion-item:hover {
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+
+<body>
+  <input type="text" id="address-input" placeholder="Введите адрес">
+  <ul id="suggestions-list"></ul>
+
+  <script>
+    // Создаем переменную для хранения текущего значения инпута
+    let currentAddress = '';
+
+    // Функция для геокодинга адреса с использованием DaData API
+    function geocodeAddress(address) {
+      const apiKey = 'b3e8146c659bd793075d0a5eccb543fc47f97f01';
+      const endpoint = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address';
+
+      // return new Promise((resolve, reject) => { - Создается новый объект Promise с двумя параметрами - resolve и reject. 
+      // Эти параметры представляют функции, которые будут вызваны, когда Promise будет успешно разрешен (resolve) или отклонен (reject).
+      return new Promise((resolve, reject) => {
+        // const xhr = new XMLHttpRequest(); - Создается новый объект XMLHttpRequest, который позволяет выполнить асинхронный HTTP-запрос.
+        const xhr = new XMLHttpRequest();
+        // xhr.open('POST', endpoint, true); - Открывается соединение с сервером для отправки POST-запроса на указанный endpoint. 
+        // Последний параметр, true, указывает на асинхронный режим запроса.
+        xhr.open('POST', endpoint, true);
+        // xhr.setRequestHeader('Content-Type', 'application/json'); - Устанавливается заголовок HTTP-запроса, 
+        // указывающий, что данные будут отправлены в формате JSON.
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        // xhr.setRequestHeader('Authorization', Token ${apiKey}); - Устанавливается заголовок Authorization, 
+        // который содержит API-ключ для аутентификации на сервере DaData API.
+        xhr.setRequestHeader('Authorization', `Token ${apiKey}`);
+
+        // xhr.onreadystatechange = function () { - Устанавливается обработчик события onreadystatechange объекта XMLHttpRequest. 
+        // Этот обработчик будет вызван каждый раз, когда состояние запроса изменяется.
+        xhr.onreadystatechange = function () {
+          // if (xhr.readyState === 4) { - Проверяется состояние запроса. Когда readyState равен 4, 
+          // это означает, что запрос завершен и получен ответ.
+          if (xhr.readyState === 4) {
+            // if (xhr.status === 200) { - Проверяется статус HTTP-ответа. Если статус равен 200, это означает успешный запрос без ошибок.
+            if (xhr.status === 200) {
+              // const response = JSON.parse(xhr.responseText); - Полученный ответ от сервера (в виде строки) парсится в объект JavaScript с помощью JSON.parse(). 
+              // Теперь response содержит структурированные данные от сервера.
+              const response = JSON.parse(xhr.responseText);
+              // const suggestions = response.suggestions.map(suggestion => ({...})); - Данные из ответа структурируются в новый массив suggestions. 
+              // В данном случае, из каждой подсказки (suggestion) извлекается адрес, широта (lat) и долгота (lon) и сохраняются в массиве.
+              const suggestions = response.suggestions.map(suggestion => ({
+                address: suggestion.value,
+                lat: suggestion.data.geo_lat,
+                lon: suggestion.data.geo_lon,
+              }));
+              // resolve(suggestions); - Если запрос успешен, вызывается функция resolve объекта Promise с массивом suggestions,
+              // что означает успешное выполнение Promise с передачей данных.
+              resolve(suggestions);
+              // Если статус ответа не равен 200 (например, если возникла ошибка), то вызывается функция reject объекта Promise с текстом статуса (xhr.statusText), 
+              // что означает отклонение Promise с указанием ошибки.
+            } else {
+              reject(xhr.statusText);
+            }
+          }
+        };
+        // Создается JSON-строка requestData, содержащая данные для отправки на сервер. В данном случае, это объект с полем "query", содержащим адрес, и полем "count", 
+        // указывающим на количество желаемых результатов (в данном случае 5).
+        const requestData = JSON.stringify({ query: address, count: 5 });
+        // Выполняется отправка данных на сервер с помощью метода send() объекта XMLHttpRequest. Это начинает процесс выполнения POST-запроса к серверу DaData API.
+        xhr.send(requestData);
+        // В итоге, этот код создает и отправляет POST-запрос к серверу с данными об адресе, обрабатывает успешный ответ, 
+        // структурирует данные и разрешает Promise с этими данными, или отклоняет Promise в случае ошибки.
+      });
+    }
+    // Эта функция вызывается при обновлении текущего адреса и выполняет геокодирование адреса
+    // Функция для обновления текущего адреса и вызова геокодинга
+    function updateAddress() {
+      // const inputValue = document.getElementById('address-input').value.trim(); - Получение текущего значения поля ввода с id 'address-input' с помощью document.getElementById('address-input'). 
+      // Значение обрезается с помощью .trim(), чтобы удалить лишние пробелы с начала и конца строки.
+      const inputValue = document.getElementById('address-input').value.trim();
+      // currentAddress = inputValue; - Обновление переменной currentAddress значением из поля ввода.
+      currentAddress = inputValue;
+      // geocodeAddress(currentAddress): Вызов функции geocodeAddress(currentAddress), которая выполнит геокодирование с использованием текущего адреса.
+      // Вызываем геокодинг с текущим адресом
+      geocodeAddress(currentAddress)
+        // Этот блок выполняется, когда Promise, возвращаемый функцией geocodeAddress(), успешно разрешается. Параметр suggestions содержит результаты геокодирования (список подсказок).
+        .then(suggestions => {
+          // элемент с id 'suggestions-list', который представляет собой список для отображения подсказок.
+          // Отображаем найденные подсказки в выпадающем списке
+          const suggestionsList = document.getElementById('suggestions-list');
+          // suggestionsList.innerHTML = ''; - Очищение содержимого элемента 'suggestions-list', чтобы подготовить его к отображению новых подсказок.
+          suggestionsList.innerHTML = '';
+          // suggestions.forEach(suggestion => { - Итерация по списку подсказок.
+          suggestions.forEach(suggestion => {
+            // const listItem = document.createElement('li'); - Создание элемента списка <li>, который будет представлять подсказку.
+            const listItem = document.createElement('li');
+            // listItem.classList.add('suggestion-item'); - Добавление класса 'suggestion-item' к элементу списка для стилизации элементов списка.
+            listItem.classList.add('suggestion-item');
+            // listItem.textContent = suggestion.address; - Установка текстового содержания элемента списка равным адресу из текущей подсказки. Иными словами отрисовка адреса.
+            listItem.textContent = suggestion.address;
+            // listItem.addEventListener('click', () => { - Добавление слушателя события "click" к элементу списка. Этот слушатель будет вызывать функцию при клике на элементе.
+            listItem.addEventListener('click', () => {
+              // При клике на элемент списка адрес из подсказки устанавливается в поле ввода с id 'address-input'.
+              document.getElementById('address-input').value = suggestion.address;
+              // Скрываем список подсказок
+              suggestionsList.style.display = 'none';
+            });
+            // suggestionsList.appendChild(listItem); - Элемент списка (подсказка) добавляется в список.
+            suggestionsList.appendChild(listItem);
+          });
+          // suggestionsList.style.display = 'block'; - После обработки подсказок, список подсказок снова отображается, устанавливая стиль display в 'block'. (Отрисовка подсказок)
+          suggestionsList.style.display = 'block';
+        })
+        .catch(error => {
+          console.error('Ошибка геокодинга:', error);
+        });
+    }
+    // let debounceTimer; - Здесь объявляется переменная debounceTimer, которая будет использоваться для хранения идентификатора таймера, используемого для дебаунсинга.
+    let debounceTimer;
+    // Функция для обработки ввода пользователя
+    function handleInput() {
+      // const debounceTimeout = 300; - Создается переменная debounceTimeout, 
+      // в которой задается значение задержки для дебаунсинга в миллисекундах.
+
+      // Здесь мы используем дебаунсинг с задержкой 300 миллисекунд (или 0.3 секунды).
+      const debounceTimeout = 300;
+      // clearTimeout(debounceTimer); - Эта строка отменяет предыдущий таймер дебаунсинга, если он уже был установлен. 
+      // Это гарантирует, что функция updateAddress() не будет вызвана, если пользователь продолжает быстро вводить текст.
+      clearTimeout(debounceTimer);
+      // debounceTimer = setTimeout(() => { ... }, debounceTimeout); - Здесь создается новый таймер с использованием setTimeout(). Функция, переданная внутрь setTimeout(), 
+      // будет выполнена через указанный интервал времени (debounceTimeout). 
+      // Внутри этой функции вызывается функция updateAddress(), которая обновляет адрес на основе введенных данных и выполняет геокодирование.
+      debounceTimer = setTimeout(() => {
+        // Вызываем функцию обновления текущего адреса
+        updateAddress();
+      }, debounceTimeout);
+    }
+    // Далее устанавливается обработчик события input для элемента с id 'address-input'. 
+    // Это означает, что когда пользователь вводит текст в поле с этим id, будет вызываться функция handleInput(), которая в свою очередь устанавливает таймер дебаунсинга. 
+    // Таким образом, геокодирование будет выполняться только после того, как пользователь перестанет вводить текст на определенное время (300 миллисекунд). 
+    // Это позволяет снизить нагрузку на сервер и обеспечить более плавное пользовательское взаимодействие.
+
+    // Навешиваем обработчик события на ввод пользователя
+    document.getElementById('address-input').addEventListener('input', handleInput);
+
+    // Дебаунсинг (англ. debouncing) - это техника в программировании, которая используется для управления частотой вызова функций, особенно при обработке событий, 
+// таких как нажатие клавиш, перемещение мыши, или другие события, которые могут происходить очень часто и быстро.
+// Цель дебаунсинга состоит в том, чтобы сгладить или устранить "дребезг" (англ. bouncing), который может возникнуть при быстром и многократном срабатывании событий. 
+// Дребезг может возникать из-за механических колебаний контактов или просто из-за быстрого ввода пользователя.
+
+// Примеры использования дебаунсинга:
+// 1. Поиск в реальном времени: При вводе текста в поле поиска, запросы к серверу для поиска результатов могут быть слишком частыми. 
+//    Дебаунсинг позволяет отправлять запросы только после того, как пользователь завершит ввод.
+
+// 2. Изменение размера окна браузера: При изменении размера окна браузера браузер может генерировать множество событий. 
+//    Дебаунсинг позволяет выполнять обновление интерфейса только после завершения изменения размера окна.
+
+// 3. Фильтрация событий мыши: При обработке событий мыши, таких как перемещение мыши или клики, 
+//    дебаунсинг может использоваться для игнорирования лишних событий и выполнения действий только после окончания движения мыши.
+  </script>
+</body>
+
+</html>

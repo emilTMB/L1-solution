@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <script>
+    let people = [
+      { name: 'Эмиль', age: 25 },
+      { name: 'Галина', age: 30 },
+      { name: 'Юля', age: 25 },
+      { name: 'Антон', age: 22 }
+    ];
+
+    // Функция для сравнения объектов
+    function comparePeople(a, b) {
+      // Сначала сравниваем по возрасту
+      if (a.age < b.age) {
+        return -1;
+      } else if (a.age > b.age) {
+        return 1;
+      } else {
+        // Если возрасты равны, сравниваем по имени
+        return a.name.localeCompare(b.name);
+      }
+    }
+
+    // Сортируем массив с использованием функции сравнения
+    people.sort(comparePeople);
+
+    // Выводим отсортированный массив
+    console.log(people);
+  </script>
+</body>
+
+</html>

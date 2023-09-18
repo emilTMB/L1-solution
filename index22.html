@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        document.write(document.write(document.write()));
+        //Браузер будет выводить текст на страницу undefinedundefined
+        let count = 0
+        function infiniteDocumentWrite() {
+            try {
+                count++;
+                document.write("undefined");
+                infiniteDocumentWrite();
+            }catch(error) {
+                console.error("Количество вызовов вложенной функции:", count);
+            }
+
+        }
+
+        infiniteDocumentWrite();
+        // глубина вложенности может быть ограничена размером коллстека
+        // глубина вложенности в гугл хром равна 8945
+
+        //Внутренний document.write() вызов будет выполнен сначала, и его результат будет вставлен внутрь внешнего document.write().
+        //Внутренний document.write() вернет undefined, так как он не возвращает какое-либо значение.
+        //Поскольку внутренний вызов document.write() возвращает undefined, внешний вызов document.write(undefined); попытается вывести строку "undefined" на страницу.
+        //Чем больше раз мы вызовем document.write() внутри document.write() тем больше undefinedundefinedundefinedundefined мы получим.
+    </script>
+</body>
+
+</html>

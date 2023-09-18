@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Виджет стены вк</title>
+</head>
+
+<body>
+    <div id="widget-container"
+        style="width: 800px; height: 600px; overflow: auto; border: 1px solid black; padding: 15px;"></div>
+
+    <template id="post-template">
+        <div class="post" style="background-color: rgba(0, 0, 0, 0.14); display: flex; flex-direction: column; align-items: center; padding: 15px; border-radius: 15px; margin-bottom: 15px;">
+            <p class="post-text"></p>
+            <div class="post-images"></div>
+        </div>
+    </template>
+
+    <script type="text/javascript">
+        // loading: Эта переменная используется как флаг для отслеживания состояния загрузки данных. 
+        // Когда данные загружаются, loading устанавливается в true, чтобы предотвратить дополнительные запросы до завершения текущей загрузки.
+        let loading = false; // Флаг для отслеживания загрузки данных
+
+        // Функция handleResponse(data):
+        //  1. Эта функция обрабатывает данные, полученные в ответе на JSONP-запрос.
+        //  2. Если данные успешно получены (data.response существует), код извлекает посты из полученных данных, 
+        //     создает HTML-элементы для каждого поста и добавляет их в контейнер на веб-странице. Каждый пост может содержать текст и изображения.
+        //  3. Посты также сохраняются в локальном хранилище браузера.
+        //  4. Затем функция вызывает trimLocalStorage, чтобы удостовериться, что локальное хранилище не переполнилось, и выводит информацию о занимаемой памяти в консоль.
+
+        // Функция для обработки данных после получения JSONP-ответа
+        function handleResponse(data) {
+            //if (data && data.response) { - Эта строка проверяет, что data существует и у него есть свойство response. 
+            //Это нужно для обеспечения того, что данные были успешно получены в ответе.
+            if (data && data.response) {
+                // let posts = data.response.items; - Мы извлекаем массив постов из свойства items в объекте response. Этот массив содержит посты, полученные в ответе от сервера.
+                // Обработка полученных данных и отображение постов
+                let posts = data.response.items;
+                // let container = document.getElementById('widget-container'); - Мы находим HTML-элемент с идентификатором 'widget-container'. 
+                // Это контейнер, в который будут добавляться отображаемые посты.
+                let container = document.getElementById('widget-container');
+                // posts.forEach(function (post) { - Здесь начинается цикл forEach, который перебирает каждый пост в массиве posts.
+                posts.forEach(function (post) {
+                    // let template = document.getElementById('post-template'); - Мы находим HTML-элемент с идентификатором 'post-template'. Это шаблон для отображения каждого поста.
+                    let template = document.getElementById('post-template');
+                    // let clone = document.importNode(template.content, true); - Мы создаем клон шаблона с помощью document.importNode. 
+                    // Это позволяет создать копию шаблона, которую мы будем заполнять данными из каждого поста.
+                    let clone = document.importNode(template.content, true);
+                    // let postElement = clone.querySelector('.post-text'); - Мы находим элемент внутри клонированного шаблона с классом 'post-text'. 
+                    // Это место, куда мы будем добавлять текст поста.
+                    let postElement = clone.querySelector('.post-text');
+                    // let imagesContainer = clone.querySelector('.post-images'); - Мы также находим контейнер для изображений внутри клонированного шаблона с классом 'post-images'. 
+                    // Здесь мы будем добавлять изображения поста.
+                    let imagesContainer = clone.querySelector('.post-images');
+
+                    // Добавляем текст поста
+                    postElement.textContent = post.text;
+                    // if (post.attachments && post.attachments.length > 0) { - Мы проверяем, есть ли у поста вложения (attachments) и что их количество больше нуля.
+                    // Добавляем изображения поста
+                    if (post.attachments && post.attachments.length > 0) {
+                        // post.attachments.forEach(function (attachment) { - Мы начинаем перебирать вложения поста, если они существуют.
+                        post.attachments.forEach(function (attachment) {
+                            // if (attachment.type === 'photo') { - Мы проверяем, что тип вложения - это фотография.
+                            if (attachment.type === 'photo') {
+                                // let imageElement = document.createElement('img'); - Мы создаем элемент <img>, который будет использоваться для отображения фотографии.
+                                let imageElement = document.createElement('img');
+                                // imageElement.src = attachment.photo.sizes[2].url; - Мы устанавливаем источник (src) для изображения из данных вложения. 
+                                // В данном случае, выбирается URL среднего размера изображения.
+                                imageElement.src = attachment.photo.sizes[2].url; // Выбираем размер изображения
+                                // imagesContainer.appendChild(imageElement); - Мы добавляем элемент изображения в контейнер imagesContainer, чтобы отобразить изображение в посте.
+                                imagesContainer.appendChild(imageElement);
+                            }
+                        });
+                    }
+                    // container.appendChild(clone); - Мы добавляем клонированный и заполненный шаблон поста в общий контейнер container на веб-странице.
+                    container.appendChild(clone);
+                });
+
+                // let cachedData = loadFromLocalStorage('cachedData') || []; - Здесь мы загружаем данные из локального хранилища с ключом 'cachedData'.
+                // Если данных нет, мы создаем пустой массив.
+                let cachedData = loadFromLocalStorage('cachedData') || [];
+                // cachedData.push.apply(cachedData, posts); - Мы добавляем новые посты (из переменной posts) к существующим данным в cachedData.
+                cachedData.push.apply(cachedData, posts); // Добавляем новые посты к существующим данным
+                // saveToLocalStorage('cachedData', cachedData); - Мы сохраняем обновленные данные в локальное хранилище под ключом 'cachedData'.
+                saveToLocalStorage('cachedData', cachedData);
+                // trimLocalStorage('cachedData', 100); - Мы вызываем функцию trimLocalStorage для того чтобы убедиться, 
+                // что данные в локальном хранилище не превышают 100 записей (или другое указанное максимальное значение).
+                // Вызываем функцию для вытеснения старых данных
+                trimLocalStorage('cachedData', 100); // Указать максимальное количество записей
+                // loading = false; - После успешной обработки данных и их отображения, а также сохранения в локальное хранилище, 
+                // флаг loading устанавливается в false, чтобы указать, что загрузка данных завершена.
+                loading = false; // После загрузки данных снимаем флаг загрузки
+                // В блоке else обрабатывается случай ошибки при загрузке данных. В этом случае, флаг loading также устанавливается в false, 
+                // и выводится сообщение об ошибке в консоль.
+            } else {
+                console.error('Ошибка при загрузке постов');
+                loading = false; // В случае ошибки снимаем флаг загрузки
+            }
+        }
+
+        // Функция loadPosts(offset):
+        //  1. Эта функция создает JSONP-запрос для загрузки постов из VKontakte.
+        //  2. Она проверяет переменную loading, чтобы убедиться, что другой запрос не выполняется в данный момент.
+        //  3. Затем создается элемент <script>, и его src устанавливается для выполнения запроса к API VK с определенными параметрами, 
+        //     включая смещение (offset) и количество постов для загрузки.
+        //  4. После выполнения запроса, функция вызывает trimLocalStorage и выводит информацию о занимаемой памяти в консоль.
+
+        // Функция для создания JSONP-запроса
+        function loadPosts(offset) {
+            if (loading) return; // Если идет загрузка, не делаем новый запрос
+            loading = true; // Устанавливаем флаг загрузки
+
+            let script = document.createElement('script');
+            script.src = 'https://api.vk.com/method/wall.get?owner_id=-124728567&offset=' + offset + '&count=10&filter=all&access_token=4f3f76504f3f76504f3f7650394c2aedb744f3f4f3f76502a3f1fe8a568382a9e86ab53&v=5.131&callback=handleResponse';
+
+            script.onload = function () {
+                // Вызываем функцию для вытеснения старых данных
+                trimLocalStorage('cachedData', 100); // Указать максимальное количество записей
+
+                // Выводим объем занимаемой памяти в консоль
+                console.log('Занимаемая память в localStorage: ' + calculateLocalStorageSize() + ' MB');
+                console.log('Максимальный объем localStorage:', maxLocalStorageSize, 'MB');
+
+                loading = false; // После загрузки данных снимаем флаг загрузки
+            };
+
+            // Добавляем скрипт в DOM, что запустит JSONP-запрос
+            document.head.appendChild(script);
+        }
+
+        // Функция handleScroll():
+        //  1. Эта функция отслеживает событие прокрутки контейнера, в котором отображаются посты.
+        //  2. Когда пользователь доскролливает до конца контейнера, она вызывает loadPosts для загрузки дополнительных постов.
+
+        // Функция для отслеживания события прокрутки
+        function handleScroll() {
+            let container = document.getElementById('widget-container');
+            if (container.scrollHeight - container.scrollTop === container.clientHeight) {
+                // Если достигли нижней границы контейнера, загружаем следующие посты
+                loadPosts(container.querySelectorAll('.post').length);
+            }
+        }
+
+        // Функции для работы с локальным хранилищем:
+        // 1. saveToLocalStorage(key, data): Сохраняет данные в локальном хранилище, фильтруя уникальные посты.
+        // 2. loadFromLocalStorage(key): Загружает данные из локального хранилища по ключу.
+        // 3. trimLocalStorage(key, maxItems): Убеждается, что локальное хранилище не содержит более maxItems элементов, удаляя старые, если это необходимо.
+        // 4. calculateLocalStorageSize(): Подсчитывает общий объем занимаемой памяти в локальном хранилище.
+
+        // Функция для сохранения данных в localStorage
+        function saveToLocalStorage(key, data) {
+            try {
+                // let cachedData = loadFromLocalStorage(key) || []; - Мы вызываем функцию loadFromLocalStorage с переданным ключом key, чтобы попытаться загрузить данные из локального хранилища. 
+                // Если данных нет (или если возникла ошибка при загрузке), мы устанавливаем cachedData в пустой массив [].
+                let cachedData = loadFromLocalStorage(key) || [];
+                // data.forEach(function (post) { - Мы начинаем перебор элементов в массиве data, который предполагается сохранить в локальное хранилище.
+                // Фильтруем уникальные посты на основе их идентификаторов
+                data.forEach(function (post) {
+                    // if (!cachedData.some(function (cachedPost) { return cachedPost.id === post.id; })) { - Используем метод some для проверки, 
+                    // существует ли в массиве cachedData уже элемент с тем же идентификатором (id) как у текущего post. Если такой элемент не существует, условие становится истинным (true).
+                    if (!cachedData.some(function (cachedPost) {
+                        return cachedPost.id === post.id;
+                    })) {
+                        // cachedData.push(post); - Если текущий post не найден в cachedData, мы добавляем его в cachedData с помощью метода push.
+                        cachedData.push(post);
+                    }
+                });
+                // localStorage.setItem(key, JSON.stringify(cachedData)); - Мы сохраняем обновленный cachedData в локальное хранилище браузера под указанным ключом key. 
+                // Прежде чем сохранить его, мы преобразуем cachedData в JSON-строку с помощью JSON.stringify.
+                localStorage.setItem(key, JSON.stringify(cachedData));
+            } catch (e) {
+            }
+        }
+
+        // Функция для загрузки данных из localStorage
+        function loadFromLocalStorage(key) {
+            try {
+                // const data = localStorage.getItem(key); - Мы используем метод localStorage.getItem(key) для попытки получения данных из локального хранилища с ключом key. 
+                // Эти данные будут сохранены в переменной data.
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+
+                // Здесь мы проверяем, есть ли значение в переменной data (если данные были найдены в локальном хранилище). 
+                // Если data существует (не равно null или undefined), мы используем JSON.parse(data) для преобразования JSON-строки обратно в JavaScript-объект и возвращаем его. 
+                // В противном случае, если данных не было найдено, мы возвращаем null.
+                return data ? JSON.parse(data) : null;
+            } catch (e) {
+                // return null; - Если произошла ошибка при доступе к локальному хранилищу (например, если оно недоступно или переполнено), мы возвращаем null в блоке catch.
+                return null;
+            }
+        }
+
+        // Функция для вытеснения старых данных
+        function trimLocalStorage(key, maxItems) {
+            // let cachedData = loadFromLocalStorage(key) || []; - Мы начинаем функцию, загружая данные из локального хранилища, 
+            // используя функцию loadFromLocalStorage с указанным ключом key. Если данных с таким ключом нет или возникла ошибка при их загрузке, 
+            // мы создаем cachedData с пустым массивом [].
+            let cachedData = loadFromLocalStorage(key) || [];
+            // if (cachedData.length > maxItems) { - Здесь мы проверяем, превышает ли текущее количество элементов в cachedData (cachedData.length) максимальное значение maxItems, которое передается как аргумент.
+            if (cachedData.length > maxItems) {
+                // cachedData = cachedData.slice(-maxItems); - Если обнаруживается, что количество элементов превышает maxItems, 
+                // мы применяем метод slice к массиву cachedData, чтобы оставить только последние maxItems элементов. 
+                // Это позволяет нам "срезать" старые элементы, оставив только самые новые.
+                cachedData = cachedData.slice(-maxItems);
+                // Затем мы вызываем функцию saveToLocalStorage, чтобы перезаписать локальное хранилище данными из обрезанного cachedData. 
+                // Таким образом, у нас всегда будет не более maxItems элементов в локальном хранилище.
+            }
+            saveToLocalStorage(key, cachedData);
+        }
+
+        // Функция для подсчета занимаемой памяти
+        function calculateLocalStorageSize() {
+            let totalSize = 0;
+
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                let value = localStorage.getItem(key);
+                totalSize += key.length + value.length;
+            }
+
+            let totalSizeInMB = totalSize / (1024 * 1024); // Преобразуем в мегабайты
+            return totalSizeInMB;
+        }
+
+        // Функция getMaxLocalStorageSize():
+        // Эта функция определяет максимальный объем локального хранилища, который можно использовать без превышения лимитов браузера.
+        // максимальный объем занимаемой памяти
+        // Прокомментирована в задании 18.
+        function getMaxLocalStorageSize() {
+            let minSize = 0;
+            let maxSize = 10 * 1024 * 1024; // Начнем с максимально возможного объема (10 МB)
+
+            while (maxSize - minSize > 1) {
+                let testSize = Math.floor((minSize + maxSize) / 2);
+                try {
+                    let data = 'a'.repeat(testSize); // Создаем строку определенного размера
+                    localStorage.setItem('test', data);
+                    localStorage.removeItem('test');
+                    minSize = testSize;
+                } catch (e) {
+                    maxSize = testSize;
+                }
+            }
+
+            return minSize / (1024 * 1024); // Возвращаем размер в мегабайтах
+        }
+
+        let remainderLocalStorageSize = getMaxLocalStorageSize();
+        let tryLocalStorageSize = calculateLocalStorageSize();
+        let maxLocalStorageSize = remainderLocalStorageSize + tryLocalStorageSize;
+
+        // window.addEventListener('load', function () { - Мы добавляем обработчик события 'load' для объекта window. Это событие срабатывает, 
+        // когда вся страница и все ее ресурсы, такие как изображения и стили, были полностью загружены. Когда событие 'load' происходит, выполняется анонимная функция.
+        // Вызываем функцию загрузки постов при загрузке страницы
+        window.addEventListener('load', function () {
+            // let cachedData = loadFromLocalStorage('cachedData') || []; - Мы загружаем данные из локального хранилища с ключом 'cachedData', используя функцию loadFromLocalStorage. 
+            // Если данных с таким ключом нет или возникла ошибка при их загрузке, мы инициализируем cachedData пустым массивом [].
+            // Извлекаем все данные из локального хранилища и отображаем их при загрузке страницы
+            let cachedData = loadFromLocalStorage('cachedData') || [];
+            // let container = document.getElementById('widget-container'); - Мы находим HTML-элемент с идентификатором 'widget-container'. 
+            // Это контейнер, в котором будут отображаться посты.
+            let container = document.getElementById('widget-container');
+            // cachedData.forEach(function (post) { - Здесь мы начинаем цикл forEach, который перебирает каждый пост в массиве cachedData. 
+            // Этот массив содержит ранее загруженные посты.
+            cachedData.forEach(function (post) {
+                // let template = document.getElementById('post-template'); - Мы находим HTML-элемент с идентификатором 'post-template'. 
+                // Это шаблон, который будет использоваться для отображения каждого поста.
+                let template = document.getElementById('post-template');
+                // let clone = document.importNode(template.content, true); - Мы создаем клон шаблона с помощью document.importNode. 
+                // Это позволяет создать копию шаблона, которую мы будем заполнять данными из каждого поста.
+                let clone = document.importNode(template.content, true);
+                // let postElement = clone.querySelector('.post-text'); - Мы находим элемент внутри клонированного шаблона с классом 'post-text'. 
+                // Это место, куда мы будем добавлять текст поста.
+                let postElement = clone.querySelector('.post-text');
+                // let imagesContainer = clone.querySelector('.post-images'); - Мы также находим контейнер для изображений внутри клонированного шаблона с классом 'post-images'. 
+                // Здесь мы будем добавлять изображения поста.
+                let imagesContainer = clone.querySelector('.post-images');
+                // postElement.textContent = post.text; - Мы устанавливаем текст поста внутри элемента postElement, чтобы отобразить текст поста.
+                // Добавляем текст поста
+                postElement.textContent = post.text;
+                // if (post.attachments && post.attachments.length > 0) { - Здесь мы проверяем, есть ли у поста вложения (attachments) и что их количество больше нуля.
+                // Добавляем изображения поста
+                if (post.attachments && post.attachments.length > 0) {
+                    // post.attachments.forEach(function (attachment) { - Мы начинаем перебирать вложения поста, если они существуют.
+                    post.attachments.forEach(function (attachment) {
+                        // if (attachment.type === 'photo') { - Мы проверяем, что тип вложения - это фотография.
+                        if (attachment.type === 'photo') {
+                            // let imageElement = document.createElement('img'); - Мы создаем элемент <img>, который будет использоваться для отображения фотографии.
+                            let imageElement = document.createElement('img');
+                            // imageElement.src = attachment.photo.sizes[2].url; - Мы устанавливаем источник (src) для изображения из данных вложения. 
+                            // В данном случае, выбирается URL среднего размера изображения.
+                            imageElement.src = attachment.photo.sizes[2].url; // Выбираем размер изображения
+                            // imagesContainer.appendChild(imageElement); - Мы добавляем элемент изображения в контейнер imagesContainer, чтобы отобразить изображение в посте.
+                            imagesContainer.appendChild(imageElement);
+                        }
+                    });
+                }
+                // container.appendChild(clone); - Мы добавляем клонированный и заполненный шаблон поста в общий контейнер container на веб-странице.
+                container.appendChild(clone);
+            });
+            // document.getElementById('widget-container').addEventListener('scroll', handleScroll); - Мы добавляем обработчик события scroll к элементу с идентификатором 'widget-container'. 
+            // Это позволяет отслеживать прокрутку контейнера для загрузки дополнительных постов при достижении его нижней границы.
+            // Добавляем обработчик события прокрутки для загрузки дополнительных постов
+            document.getElementById('widget-container').addEventListener('scroll', handleScroll);
+
+            // Мы вызываем функцию loadPosts(0), чтобы начать загрузку первых 10 постов
+            // Загружаем первые 10 постов
+            loadPosts(0);
+        });
+
+    </script>
+</body>
+
+</html>

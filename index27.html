@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Циклическая анимация элемента</title>
+    <style>
+        #animated-element {
+            width: 100px;
+            height: 100px;
+            background-color: blue;
+            transition: width 0.5s, height 0.5s;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="animated-element"></div>
+
+    <script>
+        function animateElement() {
+            // Получение ссылки на HTML-элемент с идентификатором "animated-element" и сохранение этой ссылки в переменной element. 
+            // Этот элемент будет анимироваться.
+            const element = document.getElementById("animated-element");
+            // Задание начальной ширины элемента в виде строки "100px" и сохранение этой строки в переменной initialWidth.
+            const initialWidth = "100px";
+            // Задание целевой ширины элемента в виде строки "200px" и сохранение этой строки в переменной targetWidth.
+            const targetWidth = "200px";
+            // Создание переменной isGrowing и установка ее значения в true. 
+            // Эта переменная будет использоваться для определения направления анимации: роста или уменьшения размера элемента.
+            let isGrowing = true;
+
+            // Установка интервальной функции, которая будет выполняться каждые 1000 миллисекунд (1 секунда). Эта функция и будет управлять анимацией.
+            // Запускаем циклическую анимацию с интервалом в 2 секунды
+            setInterval(function () {
+                // Проверка значения переменной isGrowing. Если isGrowing равно true, то выполняется следующий блок кода.
+                if (isGrowing) {
+                    // устанавливаем новое значение
+                    element.style.width = targetWidth;
+                    element.style.height = targetWidth;
+                } else {
+                    // устанавливаем начальное значение
+                    element.style.width = initialWidth;
+                    element.style.height = initialWidth;
+                }
+
+                // Переключаем флаг для изменения направления анимации
+                isGrowing = !isGrowing;
+
+                // Добавляем класс для стилизации
+                element.classList.add("animate");
+            }, 1000); // Интервал в миллисекундах
+        }
+
+        // Вызываем функцию анимации после загрузки страницы
+        window.onload = animateElement;
+    </script>
+</body>
+
+</html>

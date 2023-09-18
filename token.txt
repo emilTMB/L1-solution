@@ -1,0 +1,167 @@
+id группы мой тамбов owner_id -124728567
+сокращенная ссылка domain vk.cc/5Fs7dW
+const count = 10;
+filter=all
+сервисный ключ доступа 4f3f76504f3f76504f3f7650394c2aedb744f3f4f3f76502a3f1fe8a568382a9e86ab53
+
+
+
+
+script.src = `https://api.vk.com/method/wall.get?owner_id=-124728567&domain=vk.cc/5Fs7dW&offset=${offset}&count=${count}&filter=all&access_token=4f3f76504f3f76504f3f7650394c2aedb744f3f4f3f76502a3f1fe8a568382a9e86ab53&v=5.131&callback=callbackFunc`;
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VK Wall Widget</title>
+</head>
+<body>
+    <div id="widget-container" style="width: 600px; height: 600px; overflow: auto; border: 1px solid black; padding: 15px;"></div>
+
+    <template id="post-template">
+        <div class="post">
+            <p class="post-text"></p>
+            <div class="post-images"></div>
+        </div>
+    </template>
+
+    <script type="text/javascript">
+        let loading = false; // Флаг для отслеживания загрузки данных
+
+        // Функция для обработки данных после получения JSONP-ответа
+        function handleResponse(data) {
+            if (data && data.response) {
+                // Обработка полученных данных и отображение постов
+                let posts = data.response.items;
+                let container = document.getElementById('widget-container');
+
+                posts.forEach(function (post) {
+                    let template = document.getElementById('post-template');
+                    let clone = document.importNode(template.content, true);
+                    let postElement = clone.querySelector('.post-text');
+                    let imagesContainer = clone.querySelector('.post-images');
+
+                    // Добавляем текст поста
+                    postElement.textContent = post.text;
+
+                    // Добавляем изображения поста
+                    if (post.attachments && post.attachments.length > 0) {
+                        post.attachments.forEach(function (attachment) {
+                            if (attachment.type === 'photo') {
+                                let imageElement = document.createElement('img');
+                                imageElement.src = attachment.photo.sizes[2].url; // Выбираем размер изображения
+                                imagesContainer.appendChild(imageElement);
+                            }
+                        });
+                    }
+
+                    container.appendChild(clone);
+                });
+
+                // Сохранение данных в localStorage
+                let cachedData = loadFromLocalStorage('cachedData') || [];
+                cachedData = cachedData.concat(posts);
+                saveToLocalStorage('cachedData', cachedData);
+
+                // Вызываем функцию для вытеснения старых данных
+                trimLocalStorage('cachedData', 100); // Указать максимальное количество записей
+
+                loading = false; // После загрузки данных снимаем флаг загрузки
+            } else {
+                console.error('Ошибка при загрузке постов');
+                loading = false; // В случае ошибки снимаем флаг загрузки
+            }
+        }
+
+        // Функция для создания JSONP-запроса
+        // Функция для создания JSONP-запроса
+function loadPosts(offset) {
+    if (loading) return; // Если идет загрузка, не делаем новый запрос
+    loading = true; // Устанавливаем флаг загрузки
+
+    let script = document.createElement('script');
+    script.src = 'https://api.vk.com/method/wall.get?owner_id=-124728567&offset=' + offset + '&count=10&filter=all&access_token=4f3f76504f3f76504f3f7650394c2aedb744f3f4f3f76502a3f1fe8a568382a9e86ab53&v=5.131&callback=handleResponse';
+
+    script.onload = function () {
+        // Вызываем функцию для вытеснения старых данных
+        trimLocalStorage('cachedData', 100); // Указать максимальное количество записей
+
+        // Выводим объем занимаемой памяти в консоль
+        console.log('Занимаемая память в localStorage после загрузки новых постов: ' + calculateLocalStorageSize());
+
+        loading = false; // После загрузки данных снимаем флаг загрузки
+    };
+
+    // Добавляем скрипт в DOM, что запустит JSONP-запрос
+    document.head.appendChild(script);
+}
+
+        // Функция для отслеживания события прокрутки
+        function handleScroll() {
+            let container = document.getElementById('widget-container');
+            if (container.scrollHeight - container.scrollTop === container.clientHeight) {
+                // Если достигли нижней границы контейнера, загружаем следующие посты
+                loadPosts(container.querySelectorAll('.post').length);
+            }
+        }
+
+        // Функция для сохранения данных в localStorage
+        function saveToLocalStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+            } catch (e) {
+                // Место для обработки ошибки, если локальное хранилище переполнено или недоступно
+            }
+        }
+
+        // Функция для загрузки данных из localStorage
+        function loadFromLocalStorage(key) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Функция для вытеснения старых данных
+        function trimLocalStorage(key, maxItems) {
+            let cachedData = loadFromLocalStorage(key) || [];
+            if (cachedData.length > maxItems) {
+                cachedData = cachedData.slice(-maxItems);
+                saveToLocalStorage(key, cachedData);
+            }
+        }
+
+        // Функция для подсчета занимаемой памяти
+        function calculateLocalStorageSize() {
+    let totalSize = 0;
+
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
+        let value = localStorage.getItem(key);
+        totalSize += key.length + value.length;
+    }
+
+    let totalSizeInMB = totalSize / (1024 * 1024); // Преобразуем в мегабайты
+    return totalSizeInMB.toFixed(2) + ' Мб';
+}
+
+        // Вызываем функцию загрузки постов при загрузке страницы
+        window.addEventListener('load', function () {
+            loadPosts(0); // Начинаем с загрузки первых 10 постов
+            document.getElementById('widget-container').addEventListener('scroll', handleScroll);
+
+            // Выводим объем занимаемой памяти в консоль
+            console.log('Занимаемая память в localStorage: ' + calculateLocalStorageSize());
+        });
+    </script>
+</body>
+</html>

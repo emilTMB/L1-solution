@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script>
+        // createAndStyleElement принимает два аргумента: tagName (имя HTML-тега для создаваемого элемента) 
+        // и styles (объект, содержащий стили для применения к элементу).
+        function createAndStyleElement(tagName, styles) {
+    // Создаем новый элемент с указанным тегом
+    // Здесь создается новый HTML-элемент с именем, указанным в аргументе tagName. 
+    // Например, если вызвать функцию с аргументом "div", то будет создан новый элемент <div>.
+    const element = document.createElement(tagName);
+
+    // Здесь начинается цикл, который перебирает все свойства объекта styles. 
+    // Этот объект содержит стили, которые нужно применить к созданному элементу.
+    // Применяем стили к элементу
+    for (const property in styles) {
+        // if (styles.hasOwnProperty(property)) { - Эта строка проверяет, имеет ли объект styles собственное свойство с именем, указанным в переменной property. 
+        // Это делается для обеспечения того, что будут применены только свойства, определенные в объекте styles, а не его прототипные свойства.
+        if (styles.hasOwnProperty(property)) {
+            // element.style[property] = styles[property];: Здесь применяются стили к созданному элементу. 
+            // Свойство style объекта элемента используется для установки конкретных стилей. 
+            // Ключ property из объекта styles используется для установки значения стиля, которое также берется из объекта styles.
+            element.style[property] = styles[property];
+        }
+    }
+
+    // Добавляем элемент в DOM (в данном случае, в <body>)
+    document.body.appendChild(element);
+
+    return element; // Возвращаем созданный элемент для дальнейшего использования
+}
+
+// Пример использования функции:
+const divElement = createAndStyleElement("div", {
+    width: "200px",
+    height: "100px",
+    backgroundColor: "blue",
+    color: "white",
+    textAlign: "center",
+    lineHeight: "100px",
+    fontSize: "24px"
+});
+
+divElement.textContent = "Новый элемент";
+    </script>
+</body>
+</html>

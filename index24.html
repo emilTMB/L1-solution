@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Таблица данных</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Имя</th>
+                <th onclick="sortTable(1)">Фамилия</th>
+                <th onclick="sortTable(2)">Телефон</th>
+                <th onclick="sortTable(3)">Адрес</th>
+                <th onclick="sortTable(4)">Город</th>
+                <th onclick="sortTable(5)">Штат</th>
+                <th onclick="sortTable(6)">ZIP</th>
+            </tr>
+        </thead>
+        <tbody id="data-body">
+        </tbody>
+    </table>
+    <div id="pagination"></div>
+
+    <script>
+        // Создаем константу tableBody, которая получает ссылку на элемент с идентификатором "data-body". 
+        // Этот элемент будет использоваться для отображения данных в виде таблицы.
+        const tableBody = document.getElementById("data-body");
+
+        // Создаем константу paginationDiv, которая получает ссылку на элемент с идентификатором "pagination". 
+        // Этот элемент будет использоваться для отображения элементов пагинации.
+        const paginationDiv = document.getElementById("pagination");
+
+        // В const rowsPerPage = 50; - Задается количество строк данных, отображаемых на одной странице таблицы.
+        const rowsPerPage = 50;
+        // Создаем переменную currentPage, которая будет хранить текущую страницу таблицы.
+        let currentPage = 1;
+        // Создаем пустой массив data, который будет использоваться для хранения загруженных данных с сервера.
+        let data = [];
+
+        // Создаем асинхронную функцию для загрузки данных с сервера
+        // Функция для загрузки данных с сервера
+        async function loadData() {
+            // С помощью fetch выполняется GET-запрос к URL "http://www.filltext.com/..." для получения данных.
+            const response = await fetch("http://www.filltext.com/?rows=1000&fname=%7BfirstName%7D&lname=%7BlastName%7D&tel=%7Bphone%7Cformat%7D&address=%7BstreetAddress%7D&city=%7Bcity%7D&state=%7BusState%7Cabbr%7D&zip=%7Bzip%7D&pretty=true");
+            // Полученные данные преобразуем в формат JSON с помощью response.json()
+            // Загруженные данные присваиваем переменной data
+            data = await response.json();
+            // Вызовем функцию renderTable(currentPage), чтобы отобразить данные в таблице.
+            renderTable(currentPage);
+        }
+
+        // Объявляем функцию renderTable(page), которая отображает данные на заданной странице таблицы
+        // Функция для отрисовки данных в таблице
+        function renderTable(page) {
+            // Устанавливается текущая страница в соответствии с переданным аргументом page.
+            currentPage = page;
+            // Вычисляются индексы startIndex и endIndex для отображения только определенного диапазона данных на текущей странице.
+            //     page - это аргумент функции renderTable(page), который представляет номер текущей страницы, которую мы хотим отобразить. 
+            // Этот номер страницы передается при вызове функции renderTable, и он указывает на ту страницу, которую мы хотим отобразить.
+            //     rowsPerPage - это константа, которая представляет количество строк данных, которые мы хотим отображать на одной странице таблицы. 
+            // Это значение определено заранее в коде и указывает, сколько строк будет видно на каждой странице.
+            // page - 1 - вычитаем 1 из номера текущей страницы, так как страницы нумеруются с 1. Это позволяет перейти от номера страницы к индексу страницы, начиная с 0.
+            // (page - 1) * rowsPerPage - умножаем результат из шага 1 на количество строк на каждой странице (rowsPerPage). 
+            // Это дает нам индекс, с которого нужно начинать отображение данных для текущей страницы.
+            const startIndex = (page - 1) * rowsPerPage;
+            // Следующая строка кода вычисляет индекс, на котором заканчивается отображение данных на текущей странице таблицы. 
+            // После того, как мы определили startIndex (начальный индекс) для отображения данных на странице, endIndex (конечный индекс) помогает нам определить, 
+            // на каком индексе заканчивать отображение данных.
+            // Чтобы вычислить endIndex, мы просто добавляем rowsPerPage к startIndex. Это означает, что endIndex будет индексом строки, следующей за последней строкой на текущей странице. 
+            // Таким образом, endIndex указывает на индекс строки, которая не включается в текущую страницу данных.
+            const endIndex = startIndex + rowsPerPage;
+            // Создаем новый массив paginatedData, содержащий данные для текущей страницы.
+            const paginatedData = data.slice(startIndex, endIndex);
+            // Очищается содержимое tableBody
+            tableBody.innerHTML = "";
+            // Для каждого элемента в paginatedData создается новая строка <tr> в таблице с данными, и каждое поле данных добавляется как ячейка <td>
+            paginatedData.forEach(item => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.fname}</td>
+                    <td>${item.lname}</td>
+                    <td>${item.tel}</td>
+                    <td>${item.address}</td>
+                    <td>${item.city}</td>
+                    <td>${item.state}</td>
+                    <td>${item.zip}</td>
+                `;
+                // Строки добавляются в tableBody
+                tableBody.appendChild(row);
+            });
+            // Вызываем функцию renderPagination(), чтобы отобразить пагинацию.
+            renderPagination();
+        }
+
+        // renderPagination() отображает элементы пагинации
+        // Функция для отрисовки пагинации
+        function renderPagination() {
+            // Следующая строка кода вычисляет общее количество страниц (totalPages), которое потребуется для размещения всех данных.
+            // data.length - это длина массива данных data, которая представляет общее количество доступных данных.
+            // rowsPerPage - это количество строк данных, которые мы хотим отобразить на одной странице.
+            const totalPages = Math.ceil(data.length / rowsPerPage);
+            // Далее создаем пустую строку paginationHTML, которая будет использоваться для накопления HTML-кода элементов пагинации.
+            let paginationHTML = "";
+            // Это начало цикла for, который будет итерироваться от 1 до totalPages. Этот цикл будет создавать кнопки для каждой страницы пагинации.
+            for (let i = 1; i <= totalPages; i++) {
+                // Внутри цикла создается строка HTML-кода, которая представляет кнопку для страницы пагинации. Здесь происходит следующее:
+                // Создается кнопка с помощью элемента <button>.
+                // У кнопки устанавливается атрибут onclick, который будет вызывать функцию renderTable(i), где i - номер страницы, связанный с текущей итерацией цикла.
+                // Внутри кнопки выводится номер страницы (i).
+                paginationHTML += `<button onclick="renderTable(${i})">${i}</button>`;
+            }
+                // Строка HTML-кода добавляется к paginationHTML.
+            paginationDiv.innerHTML = paginationHTML;
+        }
+
+        // sortTable предназначена для сортировки данных в таблице по выбранной колонке. Она принимает аргумент column, 
+        // который указывает на индекс колонки, по которой нужно провести сортировку.
+        // Функция для сортировки таблицы по выбранной колонке
+        function sortTable(column) {
+            // Здесь выполняется сортировка массива data с использованием метода sort(). Этот метод принимает функцию сравнения (a, b) => { ... }, 
+            // которая сравнивает два объекта a и b на основе значения в выбранной колонке.
+            data.sort((a, b) => {
+                // Object.keys(a)[column] извлекает ключ (имя колонки) объекта a на основе переданного индекса column.
+                // keyA и keyB представляют значения в выбранной колонке для объектов a и b.
+                // Затем функция выполняет сравнение keyA и keyB и возвращает -1, 1 или 0 в зависимости от результата сравнения. 
+                // Это нужно для правильной сортировки данных.
+                const keyA = a[Object.keys(a)[column]];
+                const keyB = b[Object.keys(b)[column]];
+
+                if (keyA < keyB) return -1;
+                if (keyA > keyB) return 1;
+                return 0;
+            });
+            // После того как массив data был отсортирован, вызывается функция renderTable(currentPage). 
+            // Эта функция отображает данные в таблице на текущей странице после сортировки.
+            renderTable(currentPage);
+        }
+
+        // Загрузка данных при загрузке страницы
+        window.onload = loadData;
+    </script>
+</body>
+
+</html>

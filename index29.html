@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Взаимодействие с формой</title>
+</head>
+<body>
+    <form id="my-form">
+        <label for="name">Имя:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <input type="submit" value="Отправить">
+    </form>
+
+    <script>
+        // Функция для обработки отправки формы
+        function handleSubmit(event) {
+            event.preventDefault(); // Предотвращаем стандартное поведение формы
+
+            // Получаем данные из формы
+            // const form = event.target; - Эта строка получает ссылку на элемент формы, которая была инициирована событием отправки (event.target).
+            const form = event.target;
+            // const formData = new FormData(form); - Здесь создается объект FormData, который используется для сбора данных из формы (form) в виде пар ключ-значение. 
+            // Этот объект будет использоваться для дальнейшей обработки данных формы.
+            const formData = new FormData(form);
+
+            // Создается пустой объект data, который будет использоваться для хранения данных из формы.
+            // Выводим данные во всплывающем окне
+            const data = {};
+
+            // formData.forEach((value, key) => { data[key] = value; }); - Здесь используется метод forEach объекта formData для перебора всех пар ключ-значение в форме. 
+            // Для каждой пары выполняется функция обратного вызова, которая добавляет данные в объект data, 
+            // используя key (имя поля формы) в качестве ключа и value (значение поля формы) в качестве значения.
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            // Выводит данные из формы в виде всплывающего окна alert(). Она использует JSON.stringify для преобразования объекта data в строку JSON и отображает ее в окне.
+            alert("Данные из формы:\n" + JSON.stringify(data, null, 2));
+        }
+
+        // Находим форму по ее ID и добавляем обработчик события submit
+        const form = document.getElementById("my-form");
+        form.addEventListener("submit", handleSubmit);
+
+    </script>
+</body>
+</html>

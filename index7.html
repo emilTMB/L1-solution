@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        // Мы определили массив functions, который содержит три функции. Каждая из них принимает один аргумент callback, который представляет собой функцию обратного вызова.
+        // Создаем массив функций
+        let functions = [
+            function (callback) {
+                console.log("Функция 1");
+                setTimeout(callback); // Вызываем следующую функцию после задержки
+            },
+            function (callback) {
+                console.log("Функция 2");
+                setTimeout(callback);
+            },
+            function (callback) {
+                console.log("Функция 3");
+                setTimeout(callback);
+            }
+        ];
+
+        // Функция executeFunctionsInSequence, рекурсивно вызывает функции из массива functions в последовательном порядке.
+        // Функция для последовательного вызова функций из массива
+        function executeFunctionsInSequence(functions, index) {
+            // Проверяем index, чтобы убедиться, что мы не дошли до конца массива functions. Если index меньше длины массива, текущая функция выполняется, 
+            // и внутри нее вызывается setTimeout с функцией обратного вызова callback, которая будет вызвана после задержки. 
+            // После выполнения текущей функции, executeFunctionsInSequence вызывается с index + 1, чтобы перейти к следующей функции в массиве.
+            if (index < functions.length) {
+                // Когда мы вызываем функцию executeFunctionsInSequence, нам передается index, который указывает на текущую функцию, которая должна выполниться.
+                // Этот index используется для выбора соответствующей функции из массива functions. В данной строке currentFunction становится ссылкой на текущую функцию, 
+                // которая затем вызывается с использованием currentFunction(function () {...}) внутри блока if.
+                let currentFunction = functions[index];
+                currentFunction(function () {
+                    executeFunctionsInSequence(functions, index + 1); // Вызываем следующую функцию
+                });
+            }
+        }
+
+        // Запускаем выполнение функций
+        executeFunctionsInSequence(functions, 0);
+    </script>
+</body>
+
+</html>

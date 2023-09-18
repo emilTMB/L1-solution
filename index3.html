@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <script>
+        //  Внешняя анонимная функция
+let MathX = (function () {
+    // Приватная функция для определения, является ли число простым
+    //  Эта и другие функции определены внутри внешней анонимной функции и имеют доступ к 
+    //  переменным из области видимости этой функции, включая number, который передается 
+    //  в качестве аргумента.
+    function isPrime(number) {
+        if (number <= 1) return false;
+        if (number <= 3) return true;
+
+        if (number % 2 === 0 || number % 3 === 0) return false;
+
+        for (let i = 5; i * i <= number; i += 6) {
+            if (number % i === 0 || number % (i + 2) === 0) return false;
+        }
+
+        return true;
+    }
+
+    // Возвращаемый объект с публичными методами
+    return {
+        // Метод для вычисления N-го числа в ряду Фибоначчи
+        fibonacci: function (n) {
+            if (n <= 0) return 0;
+            if (n === 1) return 1;
+
+            let a = 0;
+            let b = 1;
+
+            for (let i = 2; i <= n; i++) {
+                let temp = a + b;
+                a = b;
+                b = temp;
+            }
+
+            return b;
+        },
+
+        // Метод для вычисления всех чисел в ряду Фибоначчи до числа N
+        fibonacciSeries: function (n) {
+            if (n <= 0) return [];
+
+            let series = [0];
+            if (n >= 1) series.push(1);
+
+            let a = 0;
+            let b = 1;
+
+            while (b <= n) {
+                let temp = a + b;
+                a = b;
+                b = temp;
+                if (b <= n) series.push(b);
+            }
+
+            return series;
+        },
+
+        // Метод для вычисления N-го простого числа
+        nthPrime: function (n) {
+            if (n <= 0) return undefined;
+
+            let count = 0;
+            let number = 1;
+
+            while (count < n) {
+                number++;
+                if (isPrime(number)) {
+                    count++;
+                }
+            }
+
+            return number;
+        },
+
+        // Метод для вычисления всех простых чисел до числа N
+        primesUpToN: function (n) {
+            if (n <= 1) return [];
+
+            let primes = [];
+            for (let i = 2; i <= n; i++) {
+                if (isPrime(i)) {
+                    primes.push(i);
+                }
+            }
+
+            return primes;
+        }
+    };
+})();
+
+console.log(MathX.fibonacci(5)); // Вычисление 5-го числа Фибоначчи (должно быть 5)
+console.log(MathX.fibonacciSeries(10)); // Вычисление всех чисел в ряду Фибоначчи до 10 (должен вернуть массив [0, 1, 1, 2, 3, 5, 8])
+console.log(MathX.nthPrime(4)); // Вычисление 4-го простого числа (должно быть 7)
+console.log(MathX.primesUpToN(20)); // Вычисление всех простых чисел до 20 (должен вернуть массив [2, 3, 5, 7, 11, 13, 17, 19])
+    </script>
+</body>
+</html>

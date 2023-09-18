@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // Переменная для отслеживания количества вызовов функции
+        let callCount = 0;
+
+        // Мы определяем функцию recursiveFunction, которая будет выполняться рекурсивно
+        function recursiveFunction() {
+            // Мы увеличиваем значение переменной callCount на 1 при каждом вызове функции. Это делается для подсчета количества вызовов.
+            callCount++;
+            recursiveFunction();
+        }
+
+        try {
+            // Продолжаем до ошибки
+            recursiveFunction();
+        } catch (error) {
+            console.error("Количество вызовов функции:", callCount);
+        }
+
+
+
+        //  Google Chrome - 13936
+        //  Yandex - 13953
+        //  Opera - 13949
+        //  Firefox - 32240
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание элемента с использованием шаблона</title>
+</head>
+<body>
+    <!-- Шаблон -->
+    <template id="my-template">
+        <div>
+            <h2>Заголовок</h2>
+            <p>Текст элемента</p>
+        </div>
+    </template>
+
+    <button onclick="createAndAddElement()">Создать и добавить элемент</button>
+
+    <div id="container"></div>
+
+    <script>
+        function createAndAddElement() {
+            // Получаем шаблон по его id
+            const template = document.getElementById("my-template");
+
+            // Клонируем содержимое шаблона
+            const clone = document.importNode(template.content, true);
+
+            // Модифицируем клон, если нужно
+            const header = clone.querySelector("h2");
+            header.textContent = "Новый заголовок";
+
+            // Добавляем клон в DOM
+            const container = document.getElementById("container");
+            container.appendChild(clone);
+        }
+    </script>
+</body>
+</html>
