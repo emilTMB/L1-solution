@@ -88,7 +88,7 @@
                 // trimLocalStorage('cachedData', 100); - Мы вызываем функцию trimLocalStorage для того чтобы убедиться, 
                 // что данные в локальном хранилище не превышают 100 записей (или другое указанное максимальное значение).
                 // Вызываем функцию для вытеснения старых данных
-                trimLocalStorage('cachedData', 100); // Указать максимальное количество записей
+                trimLocalStorage('cachedData', 100); // Максимальное количество записей
                 // loading = false; - После успешной обработки данных и их отображения, а также сохранения в локальное хранилище, 
                 // флаг loading устанавливается в false, чтобы указать, что загрузка данных завершена.
                 loading = false; // После загрузки данных снимаем флаг загрузки
@@ -117,8 +117,7 @@
 
             script.onload = function () {
                 // Вызываем функцию для вытеснения старых данных
-                trimLocalStorage('cachedData', 100); // Указать максимальное количество записей
-
+                trimLocalStorage('cachedData', 100); // Указываем максимальное количество записей
                 // Выводим объем занимаемой памяти в консоль
                 console.log('Занимаемая память в localStorage: ' + calculateLocalStorageSize() + ' MB');
                 console.log('Максимальный объем localStorage:', maxLocalStorageSize, 'MB');
@@ -171,6 +170,7 @@
                 // Прежде чем сохранить его, мы преобразуем cachedData в JSON-строку с помощью JSON.stringify.
                 localStorage.setItem(key, JSON.stringify(cachedData));
             } catch (e) {
+                console.error('Ошибка при загрузке постов');
             }
         }
 
@@ -180,7 +180,6 @@
                 // const data = localStorage.getItem(key); - Мы используем метод localStorage.getItem(key) для попытки получения данных из локального хранилища с ключом key. 
                 // Эти данные будут сохранены в переменной data.
                 const data = localStorage.getItem(key);
-                return data ? JSON.parse(data) : null;
 
                 // Здесь мы проверяем, есть ли значение в переменной data (если данные были найдены в локальном хранилище). 
                 // Если data существует (не равно null или undefined), мы используем JSON.parse(data) для преобразования JSON-строки обратно в JavaScript-объект и возвращаем его. 
